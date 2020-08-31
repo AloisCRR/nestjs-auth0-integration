@@ -38,8 +38,8 @@ export class NotesService {
   create(newNote: Note) {
     const id = this.uuidv4();
     this.notes[Object.keys(this.notes).length + 1] = {
-      ...newNote,
       id,
+      ...newNote,
     };
   }
 
