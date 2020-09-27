@@ -12,8 +12,8 @@ import { NotesService } from './notes.service';
 import { Note } from '../note';
 import { Notes } from '../notes';
 import { AuthGuard } from '@nestjs/passport';
-import { Permissions } from 'src/permissions.decorator';
-import { PermissionsGuard } from 'src/permissions.guard';
+import { Permissions } from '../permissions.decorator';
+import { PermissionsGuard } from '../permissions.guard';
 
 @Controller('notes')
 export class NotesController {

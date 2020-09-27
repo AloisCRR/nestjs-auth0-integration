@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Note } from '../note';
 import { Notes } from '../notes';
 
@@ -43,22 +43,34 @@ export class NotesService {
     };
   }
 
-  find(id: number): Note | null {
-    return this.notes[id] || null;
+  find(id: number): Note {
+    if (this.notes[id]) {
+      return this.notes[id];
+    }
+
+    throw new NotFoundException();
   }
 
-  update(note: Note, id: number): Note | Error {
-    return this.notes[id]
-      ? (this.notes[id] = note)
-      : new Error('Error updating');
+  update(note: Note, id: number): Note {
+    if (this.notes[id]) {
+      return (this.notes[id] = note);
+    }
+
+    throw new NotFoundException();
   }
 
   delete(id: number): Boolean | null {
-    return this.notes[id] ? delete this.notes[id] : null;
+    if (this.notes[id]) {
+      return delete this.notes[id];
+    }
+
+    throw new NotFoundException();
   }
 
   uuidv4(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (
+      c,
+    ) {
       const r = (Math.random() * 16) | 0,
         v = c == 'x' ? r : (r & 0x3) | 0x8;
       return v.toString(16);
