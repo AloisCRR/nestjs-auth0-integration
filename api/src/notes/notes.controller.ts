@@ -22,7 +22,7 @@ import { NotesService } from './notes.service';
 export class NotesController {
   constructor(private readonly notesService: NotesService) {}
 
-  @Get()
+  @Get('all')
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
   @Permissions('read:notes')
   adminFindAll(): Note[] {

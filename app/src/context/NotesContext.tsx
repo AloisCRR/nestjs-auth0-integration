@@ -9,6 +9,8 @@ export type NoteRequestBody = {
 
 export type NotesContextDefault = {
   notes: NoteModel[];
+  allNotes: () => Promise<void>;
+  myNotes: () => void;
   newNote: (note: NoteRequestBody) => Promise<void>;
   deleteNote: (id: string) => Promise<void>;
   updateNote: (id: string, note: NoteRequestBody) => Promise<void>;
@@ -16,6 +18,8 @@ export type NotesContextDefault = {
 
 export const NotesContext = React.createContext<NotesContextDefault>({
   notes: [],
+  allNotes: async () => undefined,
+  myNotes: () => undefined,
   newNote: async () => undefined,
   deleteNote: async () => undefined,
   updateNote: async () => undefined,
@@ -23,6 +27,7 @@ export const NotesContext = React.createContext<NotesContextDefault>({
 
 export const NotesProvider: React.FC = ({ children }) => {
   const [notes, setNotes] = useState<NoteModel[]>([]);
+  const [resetNotes, setResetNotes] = useState<boolean>(false);
   const { getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
@@ -45,7 +50,7 @@ export const NotesProvider: React.FC = ({ children }) => {
     }
 
     loadNotes();
-  }, []);
+  }, [resetNotes]);
 
   async function newNote(body: NoteRequestBody): Promise<void> {
     const accessToken = await getAccessTokenSilently();
@@ -100,7 +105,6 @@ export const NotesProvider: React.FC = ({ children }) => {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
         },
       });
 
@@ -112,8 +116,30 @@ export const NotesProvider: React.FC = ({ children }) => {
     }
   }
 
+  async function allNotes(): Promise<void> {
+    const accessToken = await getAccessTokenSilently();
+
+    try {
+      const response = await fetch(`http://localhost:4000/notes/all`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const newNotes = (await response.json()) as NoteModel[];
+
+      setNotes(newNotes);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  function myNotes(): void {
+    setResetNotes(!resetNotes);
+  }
+
   const value = useMemo<NotesContextDefault>(
-    () => ({ notes, newNote, deleteNote, updateNote }),
+    () => ({ notes, allNotes, myNotes, newNote, deleteNote, updateNote }),
     [notes],
   );
 
