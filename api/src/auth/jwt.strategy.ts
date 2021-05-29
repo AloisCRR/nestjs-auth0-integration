@@ -6,7 +6,17 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-// https://manage.auth0.com/ -> APIs -> Quick Start
+export interface UserPayload {
+  'https://notes-api.demo.com/roles': string[];
+  iss: string;
+  sub: string;
+  aud: string[];
+  iat: number;
+  exp: number;
+  azp: string;
+  scope: string;
+  permissions: string[];
+}
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -16,17 +26,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         cache: true,
         rateLimit: true,
         jwksRequestsPerMinute: 5,
-        jwksUri: `${process.env.AUTH0_DOMAIN}.well-known/jwks.json`,
+        jwksUri: `https://${process.env.AUTH0_DOMAIN}/.well-known/jwks.json`,
       }),
 
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      audience: process.env.AUTH0_AUDIENCE,
-      issuer: `${process.env.AUTH0_DOMAIN}`,
+      audience: `https://${process.env.AUTH0_AUDIENCE}`,
+      issuer: `https://${process.env.AUTH0_DOMAIN}/`,
       algorithms: ['RS256'],
     });
   }
 
-  validate(payload: any) {
+  validate(payload: UserPayload): UserPayload {
     return payload;
   }
 }

@@ -5,16 +5,16 @@ import { ValidationPipe } from '@nestjs/common';
 
 dotenv.config();
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
-  app.enableCors();
+  app.enableCors({ origin: true });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
     }),
   );
-  await app.listen(process.env.PORT);
+  await app.listen(process.env.PORT || 4000);
 }
 bootstrap();

@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
+import { UserPayload } from 'src/auth/jwt.strategy';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -14,13 +15,15 @@ export class PermissionsGuard implements CanActivate {
       context.getHandler(),
     );
 
-    const userPermissions = context.getArgs()[0].user.permissions;
+    const user = context.getArgs()[0].user as UserPayload;
+
+    const userPermissions = user.permissions;
 
     if (!routePermissions) {
       return true;
     }
 
-    const hasPermission = () =>
+    const hasPermission = (): boolean =>
       routePermissions.every((routePermission) =>
         userPermissions.includes(routePermission),
       );
